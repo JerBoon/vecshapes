@@ -8,7 +8,7 @@
 #' Return a dodecahedron  object, constructed from elementary spacial objects
 #'
 #' @param centre Centre of dodecahedron 
-#' @param size TBA
+#' @param radius Is the nominal size from the centre to each vertex. So the radius of the smallest sphere containing the object.
 #' @param properties Package-independent object defining additional properties
 #' @param bound Include a bounding sphere? Default=TRUE
 #' @param align.to Name of axis to align to - i.e. 2 surfaces will be level in that plane. Default = "x"
@@ -18,22 +18,22 @@
 #'   used for spacial indexing.
 #' 
 #' @export
-#' @importFrom vecspace Spc.MakePolygon Spc.Combine Spc.Translate Spc.Rotate
+#' @importFrom vecspace Spc.MakePolygon Spc.Combine Spc.Translate Spc.Rotate Spc.MakeSphere
 #'
 #' @family constructors
 #'
 #' @examples
 #'   w <- Spc.MakeDodecahedron(c(0,0,0), 10, surface_props)
 
-Spc.MakeDodecahedron <- function (centre, size, properties=NA, bound=TRUE, align.to="x") {
+Spc.MakeDodecahedron <- function (centre, radius, properties=NA, bound=TRUE, align.to="x") {
 
   if ((typeof(centre) != "double") || (length(centre) != 3)) {
     print("Spc.MakeDodecahedron: centre should be a 3 number vector")
     return(NA)
   }
 
-  if ((typeof(size) != "double") || (length(size) != 1)|| (size <= 0)) {
-    print("Spc.MakeDodecahedron: size should be a positive scalar numeric")
+  if ((typeof(radius) != "double") || (length(radius) != 1)|| (radius <= 0)) {
+    print("Spc.MakeDodecahedron: radius should be a positive scalar numeric")
     return(NA)
   }
 
@@ -64,8 +64,13 @@ Spc.MakeDodecahedron <- function (centre, size, properties=NA, bound=TRUE, align
                  ncol=5, byrow=TRUE)
 
   to.face <- function (v) {
-    return(Spc.MakePolygon(verts[v,1],verts[v,2],verts[v,3]))
+    return(Spc.MakePolygon(verts[v,1] * scale,verts[v,2] * scale,verts[v,3] * scale))
   }
+
+  #The default size is root 3, use in all the calculations of phi above, etc
+  #So calculate a scaling factor
+
+  scale <- radius / sqrt(3)
 
   #----
 
@@ -74,9 +79,14 @@ Spc.MakeDodecahedron <- function (centre, size, properties=NA, bound=TRUE, align
   for (i in 1:12)
     r <- append(r, to.face(faces[i,]))
 
-  r <- Spc.Combine(r, properties=properties, bound=bound)
+  #Don't use the Spc.Combine bounding algorith, it's naive!
+  r <- Spc.Combine(r, properties=properties, bound=FALSE)
 
-  r <- Spc.Translate(r, centre)
+  if (bound) {
+    sp <- Spc.MakeSphere(c(0,0,0),sqrt(3) * scale)
+    sp$objects <- r
+    r <- sp
+  }
 
   #---- rotations to plane
 
@@ -90,6 +100,8 @@ Spc.MakeDodecahedron <- function (centre, size, properties=NA, bound=TRUE, align
 
   if (align.to %in% c("z","Z"))
     r <- Spc.Rotate(r, ,pivot.angle=c(0,dihangle/2,0))
+
+  r <- Spc.Translate(r, centre)
 
   return(r)
 }

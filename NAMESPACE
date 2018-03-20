@@ -3,5 +3,6 @@
 export(Spc.MakeDodecahedron)
 importFrom(vecspace,Spc.Combine)
 importFrom(vecspace,Spc.MakePolygon)
+importFrom(vecspace,Spc.MakeSphere)
 importFrom(vecspace,Spc.Rotate)
 importFrom(vecspace,Spc.Translate)

@@ -4,13 +4,13 @@
 \alias{Spc.MakeDodecahedron}
 \title{Return a dodecahedron  object, constructed from elementary spacial objects}
 \usage{
-Spc.MakeDodecahedron(centre, size, properties = NA, bound = TRUE,
+Spc.MakeDodecahedron(centre, radius, properties = NA, bound = TRUE,
   align.to = "x")
 }
 \arguments{
 \item{centre}{Centre of dodecahedron}
 
-\item{size}{TBA}
+\item{radius}{Is the nominal size from the centre to each vertex. So the radius of the smallest sphere containing the object.}
 
 \item{properties}{Package-independent object defining additional properties}
 
