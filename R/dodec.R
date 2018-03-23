@@ -77,7 +77,7 @@ Spc.MakeDodecahedron <- function (centre, radius, properties=NA, bound=TRUE, ali
   r <- list()
 
   for (i in 1:12)
-    r <- append(r, to.face(faces[i,]))
+    r <- append(r, list(to.face(faces[i,])))
 
   #Don't use the Spc.Combine bounding algorith, it's naive!
   r <- Spc.Combine(r, properties=properties, bound=FALSE)
